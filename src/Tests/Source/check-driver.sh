@@ -23,7 +23,8 @@
 # "Copyright " in their contents.
 #
 ##################
-#set -x
+set -e
+set -x
 
 GLOB_INCLUDE=(
 *.[ch]pp
@@ -42,6 +43,8 @@ GLOB_EXCLUDE=(
 )
 
 ##################
+
+REALPATH=$(which realpath || exit 77)
 
 if [[ -z "${srcdir}" ]]; then
   echo "srcdir variable not set!"
@@ -64,7 +67,7 @@ FIND_ARGS="( -false $INCLUDE_ARGS ) -not ( -false $EXCLUDE_ARGS )"
 driver_retval=0
 
 while read source_filepath; do
-  source_relpath="$(realpath --relative-base="${SOURCE_ROOT}" "$source_filepath")"
+  source_relpath="$($REALPATH --relative-base="${SOURCE_ROOT}" "$source_filepath")"
   failed_checks_output="File: ${source_relpath}\n"
   some_checks_failed=0
 
@@ -149,4 +152,5 @@ done <<EOF
 $(find "${SOURCE_ROOT}" ${FIND_ARGS})
 EOF
 
+exit 1
 exit $driver_retval
